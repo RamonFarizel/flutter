@@ -2492,6 +2492,7 @@ public class AccessibilityBridgeTest {
     AccessibilityBridge accessibilityBridge = setUpBridge();
 
     TestSemanticsNode headingNode = new TestSemanticsNode();
+    headingNode.addFlag(AccessibilityBridge.Flag.IS_HEADER);
     headingNode.headingLevel = 2;
     headingNode.label = "Level 2 heading";
     TestSemanticsUpdate headingUpdate = headingNode.toUpdate();
@@ -2513,6 +2514,37 @@ public class AccessibilityBridgeTest {
     nonHeadingUpdate.sendUpdateToBridge(accessibilityBridge);
     AccessibilityNodeInfo nonHeadingInfo = accessibilityBridge.createAccessibilityNodeInfo(0);
     assertFalse(nonHeadingInfo.isHeading());
+  }
+
+  @Config(sdk = API_LEVELS.API_28)
+  @TargetApi(API_LEVELS.API_28)
+  @Test
+  public void itSetsHeadingWhenHeadingLevelIsPositiveButNoIsHeaderFlag() {
+    AccessibilityBridge accessibilityBridge = setUpBridge();
+
+    TestSemanticsNode headingNode = new TestSemanticsNode();
+    headingNode.headingLevel = 2;
+    headingNode.label = "Has heading level but no IS_HEADER flag";
+    TestSemanticsUpdate headingUpdate = headingNode.toUpdate();
+    headingUpdate.sendUpdateToBridge(accessibilityBridge);
+    AccessibilityNodeInfo headingInfo = accessibilityBridge.createAccessibilityNodeInfo(0);
+    assertTrue(headingInfo.isHeading());
+  }
+
+  @Config(sdk = API_LEVELS.API_28)
+  @TargetApi(API_LEVELS.API_28)
+  @Test
+  public void itSetsHeadingWhenIsHeaderFlagButHeadingLevelIsZero() {
+    AccessibilityBridge accessibilityBridge = setUpBridge();
+
+    TestSemanticsNode headingNode = new TestSemanticsNode();
+    headingNode.addFlag(AccessibilityBridge.Flag.IS_HEADER);
+    headingNode.headingLevel = 0;
+    headingNode.label = "Has IS_HEADER flag but heading level is zero";
+    TestSemanticsUpdate headingUpdate = headingNode.toUpdate();
+    headingUpdate.sendUpdateToBridge(accessibilityBridge);
+    AccessibilityNodeInfo headingInfo = accessibilityBridge.createAccessibilityNodeInfo(0);
+    assertTrue(headingInfo.isHeading());
   }
 
   AccessibilityBridge setUpBridge() {
